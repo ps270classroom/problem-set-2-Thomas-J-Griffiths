@@ -110,12 +110,13 @@ Create a histogram of this variable for just the US House races. Save the ggplot
 
 ```{r}
 impressions_millions <- fb_ads |>
-  summarize(sum(impressions))
+  mutate(impressions_millions = impressions /1e6)
   impressions_millions
   
-  fb_UShouse <- fb_ads |>
+  fb_UShouse <- impressions_millions |>
     filter(office == "US House")
-  plot_q3 <- ggplot(data = fb_UShouse, mapping = aes(x = impressions)) +
+  
+  plot_q3 <- ggplot(data = fb_UShouse, mapping = aes(x = impressions_millions)) +
     geom_histogram(color = "white")
   print(plot_q3)
   
@@ -141,9 +142,27 @@ You should save the `ggplot` output as `fb_top_plot`. You should also write `fb_
 You do not need to exactly match the labels, but you should have informative labels. The color does not need to match, but if you want to change the fill colors, you can use the `scale_fill_manual(values = c(R = "red", D = "blue"))` function (where you can change the red and blue to whatever you want). 
 
  **Rubric:** 3pts for correct axes (autograder); 3pts for correct data fed into `ggplot` (autograder); 3pts for the correct ordering of the y-axis (PDF); 3pts for fill being mapped to `party` (autograder); 1pt for plot being in knitted output and having informative labels (PDF)
-
+ 
 ## Answer 4
 
+```{r}
+house_top15 <- fb_UShouse |>
+  arrange(desc(impressions)) |>
+  select(cand_name_last, impressions, party) |>
+  slice_head(n = 15)
+
+house_top15
+
+fb_top_plot <- ggplot(data = house_top15, mapping = aes(y = reorder(cand_name_last, impressions,), x = impressions / 1e6, fill = party)) +
+  geom_bar(stat = "identity") +
+  labs(title = "Top 15 House Canidate Facebook Ad Impressions, 2017-2018",
+       x = "Facebook ad Impressions (in millions)",
+       y = NULL) +
+  scale_fill_manual(values = c(R = "red", D = "blue"))
+  
+fb_top_plot
+
+```
 
 
 \newpage
