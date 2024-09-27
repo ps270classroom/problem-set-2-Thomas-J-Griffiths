@@ -48,6 +48,7 @@ Use `dplyr` functions to create a table with the number of candidates in each ty
 library(dplyr)
 library(readr)
 library(knitr)
+library(ggplot2)
 fb_ads <- 
   read_csv("data/fb_ads.csv")
 ## There are 7014 candidates in the data set
@@ -85,12 +86,12 @@ party_incumbent_promote <- fb_ads |>
  filter(office == "US Senate" | office == "US House") |>
   mutate(promote_prop = mean(ad_tone_promote)) |>
   group_by(incumbency, party) |>
-  summarize(promote_prop = mean(ad_tone_promote, na.rm =TRUE))
+  summarize(promote_prop = mean(ad_tone_promote, na.rm = TRUE))
 party_incumbent_promote
 
 knitr::kable(digits = 3, party_incumbent_promote, col.names = c("Incumbency", "Party", "Promote Ad Proportion"))
   
-## Type of candiate with highest average ad_tone_promote are Incumbent Democrats at 85.4%
+## Type of candidate with highest average ad_tone_promote are Incumbent Democrats at 85.4%
 ```
 
 
@@ -107,6 +108,19 @@ Create a histogram of this variable for just the US House races. Save the ggplot
 
 ## Answer 3
 
+```{r}
+impressions_millions <- fb_ads |>
+  summarize(sum(impressions))
+  impressions_millions
+  
+  fb_UShouse <- fb_ads |>
+    filter(office == "US House")
+  plot_q3 <- ggplot(data = fb_UShouse, mapping = aes(x = impressions)) +
+    geom_histogram(color = "white")
+  print(plot_q3)
+  
+  ## Histogram heavily tilted towards lower amount of impressions, most candidates didn't have more than 10 million ads impressions.
+```
 
 
 \newpage
