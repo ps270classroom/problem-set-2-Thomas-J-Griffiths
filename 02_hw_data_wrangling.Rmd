@@ -49,6 +49,7 @@ library(dplyr)
 library(readr)
 library(knitr)
 library(ggplot2)
+library(forcats)
 fb_ads <- 
   read_csv("data/fb_ads.csv")
 ## There are 7014 candidates in the data set
@@ -120,7 +121,7 @@ impressions_millions <- fb_ads |>
     geom_histogram(color = "white")
   print(plot_q3)
   
-  ## Histogram heavily tilted towards lower amount of impressions, most candidates didn't have more than 10 million ads impressions.
+Histogram heavily tilted towards lower amount of impressions, most candidates didn't have more than 10 million ad impressions.
 ```
 
 
@@ -148,12 +149,15 @@ You do not need to exactly match the labels, but you should have informative lab
 ```{r}
 house_top15 <- fb_UShouse |>
   arrange(desc(impressions)) |>
-  select(cand_name_last, impressions, party) |>
+  select(cand_name_last, impressions, party, impressions_millions) |>
   slice_head(n = 15)
 
 house_top15
 
-fb_top_plot <- ggplot(data = house_top15, mapping = aes(y = reorder(cand_name_last, impressions,), x = impressions / 1e6, fill = party)) +
+house_top15_new <- house_top15 |>
+  mutate(cand_name_last = fct_reorder(cand_name_last, impressions_millions))
+
+fb_top_plot <- ggplot(data = house_top15_new, mapping = aes(y = cand_name_last, x = impressions_millions, fill = party)) +
   geom_bar(stat = "identity") +
   labs(title = "Top 15 House Canidate Facebook Ad Impressions, 2017-2018",
        x = "Facebook ad Impressions (in millions)",
